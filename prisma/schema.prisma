@@ -1,0 +1,380 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model account_list_subscribes {
+  id            String        @id @db.VarChar(64)
+  item_id       String        @default("") @db.VarChar(64)
+  platform_to   String?       @default("") @db.VarChar(32)
+  numbers       Int?          @default(0)
+  create_time   BigInt?       @default(0)
+  account_lists account_lists @relation(fields: [item_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_item_id")
+
+  @@index([item_id], map: "fk_item_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model account_lists {
+  id                      String                    @id @db.VarChar(64)
+  platform                String?                   @default("") @db.VarChar(32)
+  platform_id             String?                   @default("") @db.VarChar(64)
+  sec_uid                 String?                   @default("") @db.VarChar(255)
+  name                    String?                   @default("") @db.VarChar(128)
+  type                    String?                   @default("gray") @db.VarChar(32)
+  create_time             BigInt?                   @default(0)
+  account_list_subscribes account_list_subscribes[]
+
+  @@unique([platform, platform_id], map: "ix_platform")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model account_post_plans {
+  id            String  @id @db.VarChar(32)
+  account_id    String? @default("") @db.VarChar(32)
+  hour_origin   Int?    @default(0)
+  minute_origin Int?    @default(0)
+  hour          Int?    @default(0)
+  minute        Int?    @default(0)
+  first_time    BigInt? @default(0)
+  status        String  @default("valid") @db.VarChar(32)
+  last_time     BigInt? @default(0)
+  next_time     BigInt? @default(0)
+  create_time   BigInt? @default(0)
+
+  @@index([account_id], map: "ix_account_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model account_settings {
+  id          String    @id @db.VarChar(32)
+  account_id  String?   @default("") @db.VarChar(32)
+  group_id    String?   @default("") @db.VarChar(32)
+  item_id     String?   @default("") @db.VarChar(32)
+  item_value  String?   @default("") @db.VarChar(500)
+  create_time BigInt?   @default(0)
+  accounts    accounts? @relation(fields: [account_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_account_id")
+
+  @@index([account_id], map: "fk_account_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model account_tags {
+  id          String  @id @db.VarChar(32)
+  account_id  String? @default("") @db.VarChar(32)
+  type        String? @default("") @db.VarChar(32)
+  category    String? @default("") @db.VarChar(32)
+  value       String? @default("") @db.VarChar(64)
+  create_time BigInt? @default(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model accounts {
+  id                String              @id @db.VarChar(64)
+  member_id         String              @default("") @db.VarChar(64)
+  platform          String              @default("") @db.VarChar(32)
+  platform_id       String              @default("") @db.VarChar(128)
+  name              String              @default("") @db.VarChar(128)
+  avatar            String              @default("") @db.VarChar(500)
+  description       String              @default("") @db.VarChar(510)
+  followers         Int                 @default(0)
+  post              Int                 @default(0)
+  login_name        String              @default("") @db.VarChar(64)
+  login_password    String              @default("") @db.VarChar(64)
+  timezone          String              @default("") @db.VarChar(64)
+  timezone_offset   Int?                @default(0)
+  proxy_id          String?             @default("") @db.VarChar(32)
+  browser_setting   String              @db.Text
+  status            String              @default("verifing") @db.VarChar(32)
+  language          String?             @default("zh-CN") @db.VarChar(16)
+  fail_reason       String?             @default("") @db.VarChar(255)
+  create_time       BigInt              @default(0)
+  expire_time       BigInt              @default(0)
+  update_time       BigInt              @default(0)
+  account_settings  account_settings[]
+  members           members             @relation(fields: [member_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_member")
+  posts             posts[]
+  source_subscribes source_subscribes[]
+
+  @@unique([platform, login_name], map: "ix_platform_account")
+  @@index([member_id], map: "fk_member")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model black_mobiles {
+  id          String  @id @db.VarChar(32)
+  mobile      String? @default("") @db.VarChar(16)
+  area_code   String? @default("") @db.VarChar(8)
+  reason      String? @default("") @db.VarChar(128)
+  create_time BigInt? @default(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model managers {
+  id          String  @id @db.VarChar(64)
+  login_name  String? @default("") @db.VarChar(64)
+  password    String? @default("") @db.VarChar(128)
+  name        String? @default("") @db.VarChar(128)
+  mobile      String? @default("") @db.VarChar(32)
+  email       String? @default("") @db.VarChar(128)
+  avatar      String? @default("") @db.VarChar(255)
+  status      String? @default("valid") @db.VarChar(32)
+  create_time BigInt? @default(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model member_logs {
+  id          String  @id @db.VarChar(64)
+  member_id   String? @default("") @db.VarChar(64)
+  category    String? @default("") @db.VarChar(32)
+  context     String? @db.Text
+  create_time BigInt?
+
+  @@index([member_id], map: "ix_member_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model members {
+  id          String     @id @db.VarChar(64)
+  email       String     @unique(map: "ix_email") @default("") @db.VarChar(128)
+  password    String     @default("") @db.VarChar(128)
+  name        String     @default("") @db.VarChar(128)
+  area_code   String?    @default("") @db.VarChar(8)
+  mobile      String     @default("") @db.VarChar(32)
+  avatar      String?    @default("") @db.VarChar(255)
+  status      String?    @default("unactived") @db.VarChar(32)
+  location    String?    @default("") @db.VarChar(32)
+  sms_channel String?    @default("") @db.Char(1)
+  create_time BigInt     @default(0)
+  accounts    accounts[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model platforms {
+  id               String  @id @db.VarChar(64)
+  code             String? @unique(map: "ix_code") @default("") @db.VarChar(32)
+  name             String  @default("") @db.VarChar(32)
+  icon             String  @default("") @db.VarChar(128)
+  posts            Int     @default(0)
+  duration         Int     @default(0)
+  range_duration   Int     @default(0)
+  exclude_duration Int     @default(0)
+  create_time      BigInt  @default(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model post_comments {
+  id                  String  @id @db.VarChar(32)
+  post_id             String? @default("") @db.VarChar(32)
+  platform_uid        String? @default("") @db.VarChar(128)
+  platform_comment_id String? @unique(map: "ix_platform_comment_id") @default("") @db.VarChar(128)
+  name                String? @default("") @db.VarChar(128)
+  content             String? @db.Text
+  digg                Int?    @default(0)
+  create_time         BigInt? @default(0)
+  posts               posts?  @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_post_id")
+
+  @@index([post_id], map: "fk_post_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model posts {
+  id              String          @id @db.VarChar(64)
+  account_id      String          @default("") @db.VarChar(64)
+  source_video_id String          @default("") @db.VarChar(64)
+  title           String          @default("") @db.VarChar(255)
+  tags            String          @default("") @db.VarChar(510)
+  platform        String          @default("") @db.VarChar(32)
+  media_id        String          @default("") @db.VarChar(128)
+  target_id       String          @default("") @db.VarChar(64)
+  video           String          @default("") @db.VarChar(255)
+  cover_image     String          @default("") @db.VarChar(255)
+  views           Int             @default(0)
+  likes           Int             @default(0)
+  comments        Int             @default(0)
+  processor       String?         @db.VarChar(500)
+  create_time     BigInt          @default(0)
+  update_time     BigInt          @default(0)
+  sync_time       BigInt          @default(0)
+  publish_time    BigInt?
+  status          String          @default("preparing") @db.VarChar(32)
+  sync_status     Boolean         @default(true)
+  prepare         String?         @default("download") @db.VarChar(32)
+  remark          String?         @default("") @db.VarChar(255)
+  post_comments   post_comments[]
+  accounts        accounts        @relation(fields: [account_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_accounts")
+
+  @@index([account_id], map: "fk_accounts")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model processors {
+  id          String  @id @db.VarChar(32)
+  name        String? @default("") @db.VarChar(128)
+  cmd         String? @default("") @db.VarChar(32)
+  params      String? @default("") @db.VarChar(500)
+  description String? @default("") @db.VarChar(255)
+  create_time BigInt? @default(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model proxies {
+  id          String  @id @db.VarChar(32)
+  host        String? @default("") @db.VarChar(64)
+  port        String? @default("") @db.VarChar(16)
+  create_time BigInt? @default(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model settings {
+  id            String  @id @db.VarChar(32)
+  type          String  @default("") @db.VarChar(16)
+  label         String  @default("") @db.VarChar(32)
+  sid           String  @unique(map: "ix_sid") @default("") @db.VarChar(64)
+  group_id      String  @default("") @db.VarChar(32)
+  options       String  @db.Text
+  component     String  @default("") @db.VarChar(32)
+  default_value String  @default("") @db.VarChar(255)
+  status        String  @default("valid") @db.VarChar(16)
+  description   String? @default("") @db.VarChar(255)
+  create_time   BigInt  @default(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model source_subscribes {
+  id          String    @id @db.VarChar(64)
+  source_id   String?   @default("") @db.VarChar(64)
+  account_id  String?   @default("") @db.VarChar(64)
+  platform    String?   @default("") @db.VarChar(32)
+  type        String?   @default("subscriber") @db.VarChar(32)
+  create_time BigInt?   @default(0)
+  accounts    accounts? @relation(fields: [account_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_account")
+  sources     sources?  @relation(fields: [source_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_source_id")
+
+  @@unique([source_id, account_id, platform], map: "ix_source_account_platform")
+  @@index([account_id], map: "fk_account")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model source_videos {
+  id           String    @id @db.VarChar(64)
+  source_id    String?   @default("") @db.VarChar(64)
+  platform     String?   @default("") @db.VarChar(32)
+  media_id     String?   @default("") @db.VarChar(255)
+  title        String?   @default("") @db.VarChar(510)
+  cover_image  String?   @default("") @db.VarChar(500)
+  video_url    String?   @default("") @db.VarChar(500)
+  tags         String?   @default("") @db.VarChar(500)
+  likes        Int?      @default(0)
+  comments     Int?      @default(0)
+  collections  Int?      @default(0)
+  duration     Int?      @default(0)
+  publish_time DateTime? @db.DateTime(6)
+  status       String?   @default("uncollect") @db.VarChar(32)
+  fail_reason  String?   @default("") @db.VarChar(255)
+  fail_code    String?   @default("") @db.VarChar(16)
+  save_path    String?   @default("") @db.VarChar(255)
+  create_time  BigInt?   @default(0)
+  sources      sources?  @relation(fields: [source_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_video_source")
+  videos       videos[]
+
+  @@index([source_id], map: "fk_video_source")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model sources {
+  id                String              @id @db.VarChar(64)
+  account_id        String?             @default("") @db.VarChar(64)
+  platform          String?             @default("") @db.VarChar(32)
+  platform_id       String?             @default("") @db.VarChar(128)
+  sec_uid           String?             @default("") @db.VarChar(128)
+  name              String?             @default("") @db.VarChar(128)
+  avatar            String?             @default("") @db.VarChar(500)
+  bio               String?             @default("") @db.VarChar(500)
+  fans              Int?                @default(0)
+  posts             Int?                @default(0)
+  collect_type      String?             @default("full") @db.VarChar(32)
+  collect_interval  Int?                @default(24)
+  create_time       BigInt?             @default(0)
+  last_collect_time BigInt?             @default(0)
+  next_collect_time BigInt?             @default(0)
+  status            String?             @default("verifing") @db.VarChar(32)
+  invalid_reason    String?             @default("") @db.VarChar(255)
+  source_subscribes source_subscribes[]
+  source_videos     source_videos[]
+
+  @@unique([platform, platform_id], map: "ix_platform")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model spiders {
+  id          String  @id @db.VarChar(64)
+  platform    String? @default("") @db.VarChar(32)
+  login_name  String? @default("") @db.VarChar(64)
+  password    String? @default("") @db.VarChar(64)
+  status      String? @default("valid") @db.VarChar(32)
+  create_time BigInt? @default(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model supercloudsms {
+  id          String  @id @db.VarChar(32)
+  area_code   String? @default("") @db.VarChar(8)
+  mobile      String? @default("") @db.VarChar(16)
+  url         String? @default("") @db.VarChar(128)
+  status      String? @default("valid") @db.VarChar(16)
+  create_time BigInt?
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model unrepeat_configs {
+  id          String   @id @db.VarChar(64)
+  title       String?  @default("") @db.VarChar(64)
+  setting     String?  @default("") @db.VarChar(500)
+  create_time BigInt?  @default(0)
+  status      String?  @default("valid") @db.VarChar(32)
+  videos      videos[]
+}
+
+model users {
+  id              String @id @default("") @db.VarChar(64)
+  name            String @db.VarChar(64)
+  password        String @db.VarChar(255)
+  email           String @db.VarChar(64)
+  avatar          String @db.VarChar(255)
+  create_time     Int
+  last_login_time Int
+  last_login_ip   String @db.VarChar(16)
+  status          String @default("unactive") @db.VarChar(32)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model video_plans {
+  id          String  @id @db.VarChar(32)
+  title       String? @default("") @db.VarChar(128)
+  member_id   String? @default("") @db.VarChar(32)
+  type        String? @default("system") @db.VarChar(32)
+  options     String? @db.Text
+  description String? @default("") @db.VarChar(255)
+  create_time BigInt? @default(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model videos {
+  id               String            @id @db.VarChar(64)
+  source_video_id  String?           @default("") @db.VarChar(64)
+  setting_id       String?           @default("") @db.VarChar(64)
+  save_path        String?           @default("") @db.VarChar(255)
+  quotes           Int?              @default(0)
+  create_time      BigInt?           @default(0)
+  source_videos    source_videos?    @relation(fields: [source_video_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_source_video")
+  unrepeat_configs unrepeat_configs? @relation(fields: [setting_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_unrepeat")
+
+  @@index([source_video_id], map: "fk_source_video")
+  @@index([setting_id], map: "fk_unrepeat")
+}
