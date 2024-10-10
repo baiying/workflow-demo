@@ -1,37 +1,33 @@
-name: Nest.js CD Pipeline
+name: Deploy to Server
 
 on:
   push:
     branches:
-      - main  # 监听的分支，可以根据需要更改
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - name: Install dependencies & build
+        run: |
+          npm install
+          npm run build
+      - name: Deploy to Server
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
+          ARGS: "-avz --delete"
+          SOURCE: "dist/"
+          REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
+          REMOTE_USER: "root"
+          TARGET: /var/www/workflow_demo1
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20.x'  # Node.js 版本，须根据项目需要调整
 
-    - name: Install dependencies
-      run: npm install
-
-    - name: Build the project
-      run: npm run build
-
-    - name: Deploy to server
-      env:
-        HOST: ${{ secrets.DEPLOY_HOST }}
-        USERNAME: ${{ secrets.DEPLOY_USER }}
-        PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
-        TARGET_DIR: /var/www/workflow_demo
-      run: |
-        ssh -o StrictHostKeyChecking=no -i "$PRIVATE_KEY" "$USERNAME@$HOST" "mkdir -p $TARGET_DIR"
-        # scp -i "$PRIVATE_KEY" -r dist/* "$USERNAME@$HOST:$TARGET_DIR"
-    # 根据需要补充其他部署步骤
-    
