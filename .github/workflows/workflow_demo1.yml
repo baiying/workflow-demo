@@ -29,7 +29,7 @@ jobs:
         HOST: ${{ secrets.DEPLOY_HOST }}
         USERNAME: ${{ secrets.DEPLOY_USER }}
         PRIVATE_KEY: ${{ secrets.DEPLOY_KEY }}
-        TARGET_DIR: ${{ secrets.DEPLOY_DIR }}
+        TARGET_DIR: /var/www/workflow_demo
       run: |
         ssh -o StrictHostKeyChecking=no -i "$PRIVATE_KEY" "$USERNAME@$HOST" "mkdir -p $TARGET_DIR"
         # scp -i "$PRIVATE_KEY" -r dist/* "$USERNAME@$HOST:$TARGET_DIR"
